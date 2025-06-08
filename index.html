@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Project Management Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+      background-color: #fff;
+    }
+
+    h1 {
+      margin-top: 20px;
+    }
+
+    .task-form {
+      margin: 20px auto;
+      padding: 20px;
+      width: 300px;
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .task-form input,
+    .task-form select,
+    .task-form button {
+      width: 90%;
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+
+    .task-form button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .filter-section {
+      margin: 20px 0;
+    }
+
+    .task-list {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .task-card {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background-color: #e0f7fa;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .task-card h3 {
+      margin: 5px 0;
+    }
+
+    .progress-bar {
+      width: 80%;
+      height: 10px;
+      background-color: #f1f1f1;
+      border-radius: 10px;
+      margin: 10px 0;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background-color: green;
+      border-radius: 10px;
+    }
+
+    .task-card button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Project Management Dashboard</h1>
+
+  <div class="task-form">
+    <h3>Add New Task</h3>
+    <input type="text" id="taskName" placeholder="Task Name" />
+    <select id="taskProgress">
+      <option value="0">0%</option>
+      <option value="25">25%</option>
+      <option value="50">50%</option>
+      <option value="67">67%</option>
+      <option value="75">75%</option>
+      <option value="100">100%</option>
+    </select>
+    <button onclick="addTask()">Add Task</button>
+  </div>
+
+  <div class="filter-section">
+    <label for="statusFilter"><strong>Filter by Status</strong></label>
+    <select id="statusFilter" onchange="filterTasks()">
+      <option value="All">All</option>
+      <option value="Incomplete">Incomplete</option>
+      <option value="Complete">Complete</option>
+    </select>
+  </div>
+
+  <h2>Task List</h2>
+  <div class="task-list" id="taskList"></div>
+
+  <script>
+    const tasks = [];
+
+    function addTask() {
+      const name = document.getElementById("taskName").value.trim();
+      const progress = parseInt(document.getElementById("taskProgress").value);
+
+      if (!name) return alert("Please enter task name.");
+
+      tasks.push({ name, progress });
+      renderTasks();
+      document.getElementById("taskName").value = "";
+      document.getElementById("taskProgress").value = "0";
+    }
+
+    function renderTasks() {
+      const filter = document.getElementById("statusFilter").value;
+      const taskList = document.getElementById("taskList");
+      taskList.innerHTML = "";
+
+      let filteredTasks = tasks;
+
+      if (filter === "Complete") {
+        filteredTasks = tasks.filter(t => t.progress === 100);
+      } else if (filter === "Incomplete") {
+        filteredTasks = tasks.filter(t => t.progress < 100);
+      }
+
+      filteredTasks.forEach((task, index) => {
+        const card = document.createElement("div");
+        card.className = "task-card";
+
+        const title = document.createElement("h3");
+        title.textContent = task.name;
+
+        const progressContainer = document.createElement("div");
+        progressContainer.className = "progress-bar";
+
+        const progressFill = document.createElement("div");
+        progressFill.className = "progress-fill";
+        progressFill.style.width = `${task.progress}%`;
+
+        progressContainer.appendChild(progressFill);
+
+        const button = document.createElement("button");
+        button.textContent = "Edit";
+        button.onclick = () => {
+          const newProgress = prompt("Enter new progress (%)", task.progress);
+          if (newProgress !== null) {
+            task.progress = parseInt(newProgress);
+            renderTasks();
+          }
+        };
+
+        card.appendChild(title);
+        card.appendChild(progressContainer);
+        card.appendChild(button);
+
+        taskList.appendChild(card);
+      });
+    }
+
+    function filterTasks() {
+      renderTasks();
+    }
+  </script>
+</body>
+</html>
